@@ -11,29 +11,37 @@ int main()
     srand(time(NULL));
 
     // Deklatieren und Initialisieren der Variablen
-    bool pTurn, gameOver;
+    bool pTurn;
     int player[10][10], computer[10][10];
-    initGame(&gameOver, &pTurn, player, computer);
+    int playerScore, computerScore;
+    initGame(&pTurn, &playerScore, &computerScore, player, computer);
 
     // Gameloop
-    showBoards(player, computer);
-    while (!gameOver) {
-
+    showBoards(playerScore, computerScore, player, computer);
+    while (playerScore > 0 && computerScore > 0) {
         if (pTurn)
         {
-            if (!playerTurn(computer))
+            if (playerTurn(computer))
+            {
+                computerScore--;
+            }
+            else
             {
                 pTurn = !pTurn;
             }
         }
         else 
         {
-            if (!computerTurn(player))
+            if (computerTurn(player))
+            {
+                playerScore--;
+            }
+            else
             {
                 pTurn = !pTurn;
             }
         }
-        showBoards(player, computer);
+        showBoards(playerScore, computerScore, player, computer);
     }
 
     return 0;
@@ -44,9 +52,8 @@ int main()
 // 1 = Schiff
 // 2 = Treffer
 // 3 = Wasser (Kein Treffer)
-void initGame(bool *gameOver, bool *pTurn, int b1[10][10], int b2[10][10])
+void initGame(bool *pTurn, int *p1Score, int *p2Score, int b1[10][10], int b2[10][10])
 {
-    *gameOver = false;
     *pTurn = rand() & 1;
 
     for (int row = 0; row < 10; row++)
@@ -58,8 +65,8 @@ void initGame(bool *gameOver, bool *pTurn, int b1[10][10], int b2[10][10])
         }
     }
 
-    generateShips(b1);
-    generateShips(b2);
+    *p1Score = generateShips(b1);
+    *p2Score = generateShips(b2);
 }
 
 // Fordert den Spieler auf Koordinaten einzugeben
@@ -67,7 +74,7 @@ void initGame(bool *gameOver, bool *pTurn, int b1[10][10], int b2[10][10])
 bool playerTurn(int enemy[10][10])
 {
     char coords[4];
-    printf("Koodinaten eigeben: ");
+    printf("Koordinaten eigeben: ");
     scanf("%3s", coords);
 
     int x;
@@ -106,7 +113,7 @@ bool playerTurn(int enemy[10][10])
 
         // bereits getroffenes Feld -> erneuter Versuch
         default: 
-            printf("Ungültige Eingabe!");
+            printf("Ungueltige Eingabe!\n");
             playerTurn(enemy);
             break;
     }
@@ -138,9 +145,9 @@ bool computerTurn(int enemy[10][10])
 }
 
 // Generiert ein zufälliges Schiff und Plaziert es in einem Array
-void generateShips(int board[10][10])
+int generateShips(int board[10][10])
 {   
-    int x, y;
+    int x, y, score = 0;
     bool horizontal = true;
     bool validShip = true;
     int ships[5] = {2, 3, 3, 4, 5};
@@ -196,7 +203,11 @@ void generateShips(int board[10][10])
                 board[x][y + i] = 1;
             }
         }
+
+        score += ships[c];
     }
+
+    return score;
 }
 
 // Zeigt zwei Felder passend Formatiert in der Konsole an
@@ -204,14 +215,14 @@ void generateShips(int board[10][10])
 // "S" = Schiff
 // "X" = Treffer
 // "O" = Wasser (Kein Treffer)
-void showBoards(int b1[10][10], int b2[10][10])
+void showBoards(int s1, int s2, int b1[10][10], int b2[10][10])
 {
     // Clear Screen
     // printf("\e[1;1H\e[2J");
 
     // Oben
     printf("   ABCDEFGHIJ              ABCDEFGHIJ \n");
-    printf("  +----------+            +----------+\n");
+    printf("  +----------+     %d     +----------+     %d\n", s1, s2);
 
     //Felder
     for (int row = 0; row < 10; row++)
