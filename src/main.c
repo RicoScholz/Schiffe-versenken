@@ -1,5 +1,8 @@
 #include <stdio.h>
 
+#include <stdlib.h>
+#include <time.h>
+
 #include "../include/main.h"
 
 int main()
@@ -25,8 +28,33 @@ void initGame() {
         }
     }
 
+    generateShips(player);
+
     showBoard(player, computer);
 }
+
+void generateShips(int board[10][10])
+{   
+    int x, y;
+    int ships = 10;
+
+    srand(time(NULL));
+
+    for (int i = 0; i < ships; i++)
+    {
+        x = rand() % 10;
+        y = rand() % 10;
+
+        if (board[x][y] != 0)
+        {   
+            i--;
+            continue;
+        }
+        
+        board[x][y] = 1;   
+    }
+}
+
 
 // Zeigt zwei Felder passend Formatiert in der Konsole an
 // 
