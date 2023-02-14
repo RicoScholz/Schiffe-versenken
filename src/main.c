@@ -146,11 +146,13 @@ bool playerTurn(int enemy[10][10])
         // Verfehlt
         case 0: 
             enemy[x][y] = 3;
+            printf("\x1b[36mKein Treffer!\x1b[0m\n");
             return false;
 
         // Treffer -> erneuter Schuss
         case 1: 
             enemy[x][y] = 2; 
+            printf("\x1b[31mTreffer!\x1b[0m\n");
             return true;
 
         // bereits getroffenes Feld -> erneuter Versuch
@@ -167,16 +169,20 @@ bool computerTurn(int enemy[10][10])
     int x = rand() % 10;
     int y = rand() % 10;
 
+    char alph[10] = "ABCDEFGHIJ";
+
     switch (enemy[x][y])
     {
         // Verfehlt
         case 0: 
             enemy[x][y] = 3;
+            printf("Computer: %c%d \x1b[36mKein Treffer!\x1b[0m\n", alph[x], y+1);
             return false;
 
         // Treffer -> erneuter Schuss
         case 1: 
-            enemy[x][y] = 2; 
+            enemy[x][y] = 2;
+            printf("Computer: %c%d \x1b[31mTreffer!\x1b[0m\n", alph[x], y+1); 
             return true;
 
         // bereits getroffenes Feld -> erneuter Versuch
@@ -192,7 +198,7 @@ int generateShips(int board[10][10])
     int x, y, score = 0;
     bool horizontal = true;
     bool validShip = true;
-    int ships[6] = {2, 2, 3, 3, 4, 5};
+    int ships[6] = {5, 4, 3, 3, 2, 2};
 
     // Arbeitet alle Schiffe des arrays "ships" nacheinander ab
     for (int c = 0; c < 6; c++)
