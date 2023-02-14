@@ -5,6 +5,12 @@
 
 #include "../include/main.h"
 
+/*
+    Programierprojekt "Schiffe versenken"
+    von Zhouyi Xu, Rico Scholz
+    Stand 14.02.2023
+*/
+
 int main()
 {
     // Initialisiert den RNG mit einem Seed
@@ -21,29 +27,46 @@ int main()
     while (playerScore > 0 && computerScore > 0) {
         if (pTurn)
         {
+            // Spieler ist am Zug
             if (playerTurn(computer))
             {
+                // Treffer - Computer verliert Punkte
+                // erneuter Zug
                 computerScore--;
             }
             else
             {
+                // kein Treffer, Zug beendet
                 pTurn = !pTurn;
             }
         }
         else 
         {
+            // Computer ist am Zug
             if (computerTurn(player))
             {
+                // Treffer - Spieler verliert Punkte
+                // erneuter Zug
                 playerScore--;
             }
             else
             {
+                // kein Treffer, Zug beendet
                 pTurn = !pTurn;
             }
         }
         showBoards(playerScore, computerScore, player, computer);
     }
 
+    if (playerScore == 0)
+    {
+        playerWins();
+    }
+    if (computerScore == 0)
+    {
+        computerWins();
+    }
+    
     return 0;
 }
 
@@ -56,6 +79,7 @@ void initGame(bool *pTurn, int *p1Score, int *p2Score, int b1[10][10], int b2[10
 {
     *pTurn = rand() & 1;
 
+    // Initialisiert beide int[][] mit 0
     for (int row = 0; row < 10; row++)
     {
         for (int col = 0; col < 10; col++)
@@ -65,18 +89,20 @@ void initGame(bool *pTurn, int *p1Score, int *p2Score, int b1[10][10], int b2[10
         }
     }
 
+    // generiert Schiffe für beide Spieler und speichert den Score
     *p1Score = generateShips(b1);
     *p2Score = generateShips(b2);
 }
 
-// Fordert den Spieler auf Koordinaten einzugeben
-// Mapt Koordinaten auf das Array
+// Spielerzug
 bool playerTurn(int enemy[10][10])
 {
-    char coords[4];
+    // Fordert den Spieler auf Koordinaten einzugeben
+    char coords[3] = {0, 0, 0};
     printf("Koordinaten eigeben: ");
     scanf("%3s", coords);
 
+    // Mapt die Eingabe auf eine Koordinate
     int x;
     switch (coords[0])
     {
@@ -90,15 +116,30 @@ bool playerTurn(int enemy[10][10])
         case 'H': x = 7; break;
         case 'I': x = 8; break;
         case 'J': x = 9; break;
-        default: break;
+        default:             
+            printf("Ungueltige Eingabe!\n");
+            return playerTurn(enemy);
+            break;
     }
 
-    int y = coords[1] - '1';
-    if (coords[1] = '1' && coords[2] == '0')
+    // Ascii '0' = 48
+    // Ascii '1' = 49
+    int y;
+    if (coords[1] == 49 && coords[2] == 48) 
     {
         y = 9;
     }
+    else if (coords[1] - 49 < 10 && coords[2] == 0) 
+    {
+        y = coords[1] - 49;
+    } 
+    else
+    {
+        printf("Ungueltige Eingabe!\n");
+        return playerTurn(enemy);
+    }
 
+    // Checkt das gegnerische Feld und fuehrt den Zug aus
     switch (enemy[x][y])
     {
         // Verfehlt
@@ -113,8 +154,8 @@ bool playerTurn(int enemy[10][10])
 
         // bereits getroffenes Feld -> erneuter Versuch
         default: 
-            printf("Ungueltige Eingabe!\n");
-            playerTurn(enemy);
+            printf("Feld wurde bereits getroffen!\n");
+            return playerTurn(enemy);
             break;
     }
 }
@@ -139,7 +180,7 @@ bool computerTurn(int enemy[10][10])
 
         // bereits getroffenes Feld -> erneuter Versuch
         default: 
-            computerTurn(enemy);
+            return computerTurn(enemy);
             break;
     }
 }
@@ -152,10 +193,14 @@ int generateShips(int board[10][10])
     bool validShip = true;
     int ships[5] = {2, 3, 3, 4, 5};
 
+    // Arbeitet alle Schiffe des arrays "ships" nacheinander ab
     for (int c = 0; c < 5; c++)
     {
+        // Ausrichtung wird zufällig bestimmt
         horizontal = rand() & 1;
 
+        // je nach Ausrichtung aendert sich der bereich x,y in dem das Schiff plaziert werden kann
+        // verhindert, dass ein Schiff ueber den Rand hinaus ragt
         if (horizontal)
         {
             x = rand() % (10 - ships[c]);
@@ -167,10 +212,12 @@ int generateShips(int board[10][10])
             y = rand() % (10 - ships[c]);
         }
 
+        // Testet alle umliegenden Felder für Jedes einzelne Feld des Schiffs
         for (int j = -1; j <= 1; j++)
         {
             for (int i = -1; i < ships[c] + 1; i++)
             {
+                // Abstand zwischen einem Feld des Schiffs und einem anderen Schiff ist < 1 -> Illegale Position
                 if (horizontal)
                 {
                     if (board[x + i][y + j] != 0) 
@@ -188,13 +235,17 @@ int generateShips(int board[10][10])
             }
         }
 
+        // Mindestens einf Feld des Schiffes ist illegal
+        // Schiff wird an anderer Position getestet
         if (!validShip)
         {
+            
             validShip = true;
             c--;
             continue;
         }
 
+        // Plaziert das Schiff auf den entsprechenden Feldern
         for (int i = 0; i < ships[c]; i++)
         {
             if (horizontal) {
@@ -204,6 +255,7 @@ int generateShips(int board[10][10])
             }
         }
 
+        // erhoeht den Score um die laenge des Schiffs
         score += ships[c];
     }
 
@@ -257,4 +309,20 @@ void showBoards(int s1, int s2, int b1[10][10], int b2[10][10])
 
     // Unten
     printf("  +----------+            +----------+\n");
+}
+
+// Spieler gewinnt das Spiel
+void playerWins()
+{
+    printf("\n");
+    printf("Winner Winner, Chicken Dinner!");
+    printf("\n");
+}
+
+// Computer gewinnt das Spiel
+void computerWins()
+{
+    printf("\n");
+    printf("Oh nein, du bist ein verlierer. Learn to play, noob!");
+    printf("\n");
 }
