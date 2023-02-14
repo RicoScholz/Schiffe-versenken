@@ -59,11 +59,11 @@ int main()
         showBoards(playerScore, computerScore, player, computer);
     }
 
-    if (playerScore == 0)
+    if (computerScore == 0)
     {
         playerWins();
     }
-    if (computerScore == 0)
+    if (playerScore == 0)
     {
         computerWins();
     }
@@ -130,7 +130,7 @@ bool playerTurn(int enemy[10][10])
     {
         y = 9;
     }
-    else if (coords[1] - 49 < 10 && coords[2] == 0) 
+    else if (coords[1] - 48 >= 1 && coords[1] - 48 <= 10 && coords[2] == 0) 
     {
         y = coords[1] - 49;
     } 
@@ -271,27 +271,32 @@ void showBoards(int s1, int s2, int b1[10][10], int b2[10][10])
 {
     // Oben
     printf("\n");
-    printf("   A B C D E F G H I J               A B C D E F G H I J \n");
-    printf("  +--------------------+            +--------------------+\n");
+    printf("    A B C D E F G H I J                A B C D E F G H I J \n");
+    printf("  +---------------------+            +---------------------+\n");
 
     //Felder
     for (int row = 0; row < 10; row++)
     {
-        printf("%2d|", row+1);
+        printf("%2d| ", row+1);
         for (int col = 0; col < 10; col++)
         {
             char tile[12];
             switch(b1[col][row])
             {
                 case 0: strcpy(tile, "  "); break;
+                // Schiff - Gelbes S
                 case 1: strcpy(tile, "\x1b[33mS \x1b[0m"); break;
+                // Treffer - Rotes X
                 case 2: strcpy(tile, "\x1b[31mX \x1b[0m"); break;
+                // Wasser - Blaues X
                 case 3: strcpy(tile, "\x1b[36mX \x1b[0m"); break;
+                // Default - Leeres Feld
+                default: strcpy(tile, "  "); break;
             }
             printf("%s", tile);
         }
 
-        printf("|          %2d|", row+1);
+        printf("|          %2d| ", row+1);
 
         for (int col = 0; col < 10; col++)
         {
@@ -299,8 +304,12 @@ void showBoards(int s1, int s2, int b1[10][10], int b2[10][10])
             switch(b2[col][row])
             {
                 case 0: strcpy(tile, "  "); break;
+                // Wasser - Blaues X
                 case 2: strcpy(tile, "\x1b[31mX \x1b[0m"); break;
+                // Wasser - Blaues X
                 case 3: strcpy(tile, "\x1b[36mX \x1b[0m"); break;
+                // Default - Leeres Feld
+                default: strcpy(tile, "  "); break;
             }
             printf("%s", tile);
         }
@@ -308,23 +317,23 @@ void showBoards(int s1, int s2, int b1[10][10], int b2[10][10])
     }
 
     // Unten
-    printf("  +--------------------+            +--------------------+\n");
-    printf("         Score: %d                        Score: %d       \n", s1, s2);
+    printf("  +---------------------+            +---------------------+\n");
+    printf("         Score: %d                          Score: %d       \n", s1, s2);
     printf("\n");
 }
 
 // Spieler gewinnt das Spiel
 void playerWins()
 {
-    printf("\n");
     printf("Winner Winner, Chicken Dinner!");
+    printf("\n");
     printf("\n");
 }
 
 // Computer gewinnt das Spiel
 void computerWins()
 {
-    printf("\n");
     printf("Oh nein, du bist ein verlierer. Learn to play, noob!");
+    printf("\n");
     printf("\n");
 }
