@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
@@ -6,7 +7,7 @@
 #include "../include/main.h"
 
 /*
-    Programierprojekt "Schiffe versenken"
+    Programmierprojekt "Schiffe versenken"
     von Zhouyi Xu, Rico Scholz
     Stand 14.02.2023
 */
@@ -191,10 +192,10 @@ int generateShips(int board[10][10])
     int x, y, score = 0;
     bool horizontal = true;
     bool validShip = true;
-    int ships[5] = {2, 3, 3, 4, 5};
+    int ships[6] = {2, 2, 3, 3, 4, 5};
 
     // Arbeitet alle Schiffe des arrays "ships" nacheinander ab
-    for (int c = 0; c < 5; c++)
+    for (int c = 0; c < 6; c++)
     {
         // Ausrichtung wird zufällig bestimmt
         horizontal = rand() & 1;
@@ -239,7 +240,6 @@ int generateShips(int board[10][10])
         // Schiff wird an anderer Position getestet
         if (!validShip)
         {
-            
             validShip = true;
             c--;
             continue;
@@ -269,12 +269,10 @@ int generateShips(int board[10][10])
 // "O" = Wasser (Kein Treffer)
 void showBoards(int s1, int s2, int b1[10][10], int b2[10][10])
 {
-    // Clear Screen
-    // printf("\e[1;1H\e[2J");
-
     // Oben
-    printf("   ABCDEFGHIJ              ABCDEFGHIJ \n");
-    printf("  +----------+     %d     +----------+     %d\n", s1, s2);
+    printf("\n");
+    printf("   A B C D E F G H I J               A B C D E F G H I J \n");
+    printf("  +--------------------+            +--------------------+\n");
 
     //Felder
     for (int row = 0; row < 10; row++)
@@ -282,33 +280,37 @@ void showBoards(int s1, int s2, int b1[10][10], int b2[10][10])
         printf("%2d|", row+1);
         for (int col = 0; col < 10; col++)
         {
-            char tile = ' ';
-            switch(b1[col][row]) {
-                case 0: tile = ' '; break;
-                case 1: tile = 'S'; break;
-                case 2: tile = 'X'; break;
-                case 3: tile = 'O'; break;
+            char tile[12];
+            switch(b1[col][row])
+            {
+                case 0: strcpy(tile, "  "); break;
+                case 1: strcpy(tile, "\x1b[33mS \x1b[0m"); break;
+                case 2: strcpy(tile, "\x1b[31mX \x1b[0m"); break;
+                case 3: strcpy(tile, "\x1b[36mX \x1b[0m"); break;
             }
-            printf("%c", tile);
+            printf("%s", tile);
         }
 
         printf("|          %2d|", row+1);
 
         for (int col = 0; col < 10; col++)
         {
-            char tile = ' ';
-            switch(b2[col][row]) {
-                case 0: tile = ' '; break;
-                case 2: tile = 'X'; break;
-                case 3: tile = 'O'; break;
+            char tile[12];
+            switch(b2[col][row])
+            {
+                case 0: strcpy(tile, "  "); break;
+                case 2: strcpy(tile, "\x1b[31mX \x1b[0m"); break;
+                case 3: strcpy(tile, "\x1b[36mX \x1b[0m"); break;
             }
-            printf("%c", tile);
+            printf("%s", tile);
         }
         printf("%s\n", "|");
     }
 
     // Unten
-    printf("  +----------+            +----------+\n");
+    printf("  +--------------------+            +--------------------+\n");
+    printf("         Score: %d                        Score: %d       \n", s1, s2);
+    printf("\n");
 }
 
 // Spieler gewinnt das Spiel
